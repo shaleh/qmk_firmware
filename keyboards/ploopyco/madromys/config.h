@@ -31,4 +31,5 @@
 #define SPI_MISO_PIN GP0
 #define SPI_MOSI_PIN GP7
 
+#define PLOOPY_DEFAULT_DPI 2
 #define PLOOPY_SCROLL_DPI 0
