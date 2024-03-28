@@ -156,6 +156,33 @@ report_mouse_t pointing_device_task_kb(report_mouse_t mouse_report) {
     return pointing_device_task_user(mouse_report);
 }
 
+void process_drag_scroll(uint16_t keycode, keyrecord_t* record) {
+    const bool previous_drag_scroll_state = is_drag_scroll;
+
+    if (keycode == DRAG_SCROLL) {
+#ifdef PLOOPY_DRAGSCROLL_MOMENTARY
+        is_drag_scroll = record->event.pressed;
+#else
+        if (record->event.pressed) {
+            is_drag_scroll = !is_drag_scroll;
+        }
+#endif
+    } else {
+        // Disable drag scroll when any other mouse button is pressed.
+        is_drag_scroll = false;
+    }
+
+    // When scroll begins, adjust the DPI to PLOOPY_SCROLL_DPI.
+    // When the scroll is over restore the default config.
+    if (previous_drag_scroll_state != is_drag_scroll) {
+        if (is_drag_scroll) {
+            pointing_device_set_cpi(dpi_array[PLOOPY_SCROLL_DPI]);
+        } else {
+            pointing_device_set_cpi(dpi_array[keyboard_config.dpi_config]);
+        }
+    }
+}
+
 bool process_record_kb(uint16_t keycode, keyrecord_t* record) {
     if (debug_mouse) {
         dprintf("KL: kc: %u, col: %u, row: %u, pressed: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed);
@@ -179,15 +206,8 @@ bool process_record_kb(uint16_t keycode, keyrecord_t* record) {
         pointing_device_set_cpi(dpi_array[keyboard_config.dpi_config]);
     }
 
-    if (keycode == DRAG_SCROLL) {
-#ifdef PLOOPY_DRAGSCROLL_MOMENTARY
-        is_drag_scroll = record->event.pressed;
-#else
-        if (record->event.pressed) {
-            is_drag_scroll ^= 1;
-        }
-#endif
-    }
+    // Always called to ensure side effects of scrolling are handled.
+    process_drag_scroll(keycode, record);
 
     return true;
 }
