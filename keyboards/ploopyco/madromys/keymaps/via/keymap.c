@@ -18,5 +18,15 @@
 #include QMK_KEYBOARD_H
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    [0] = LAYOUT( DRAG_SCROLL, KC_BTN4, KC_BTN5, KC_BTN3, KC_BTN1, KC_BTN2 )
+    [0] = LAYOUT( DRAG_SCROLL, KC_BTN4, KC_BTN5, KC_BTN3,
+                  KC_BTN1,                       KC_BTN2 )
+    /* Desired layout
+       [0] = LAYOUT( DRAG_SCROLL, KC_BTN4, KC_BTN5, KC_BTN3 + layer shift,
+                     KC_BTN1,                       KC_BTN2 )
+       [1] = LAYOUT( VOLUME_SCROLL, PGUP or Wheel up, PgDn or Wheel down, ___,
+                      HOME,                          END )
+       Explore combos. How they work.
+       Make a combo for Zoom in (Ctrl +) and Zoom out (Ctrol -) and Zoom reset (Ctrl 0)
+       Can I also get Mute/Video working with meet? Maybe another layer?
+     */
 };
