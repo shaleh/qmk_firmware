@@ -43,3 +43,14 @@ Nothing needs to be enabled to use this functionality.  Just add the `DRAG_SCROL
 * `#define PLOOPY_DRAGSCROLL_DIVISOR_H 8.0` - Sets the horizontal movement divisor to use when drag scroll is enabled.
 * `#define PLOOPY_DRAGSCROLL_DIVISOR_V 8.0` - Sets the vertical movement divisor to use when drag scroll is enabled.
 * `#define PLOOPY_DRAGSCROLL_INVERT` - This reverses the direction that the scroll is performed.
+* `#define PLOOPY_SCROLL_DPI` - Like `PLOOPY_DPI_DEFAULT` but used for scrolling.
+
+## Volume Scroll
+
+Volume Scroll is a custom keycode for the Ploopy devices that allows you to hold or tap a button and have the mouse movement adjust the audio volume up or down.
+
+Nothing needs to be enabled to use this functionality.  Just add the `VOLUME_SCROLL` to your keymap.
+
+The value of `PLOOPY_DRAGSCROLL_MOMENTARY` has the same effect on Volume Scroll.
+
+* `#define PLOOPY_AUDIO_DPI_VALUE` - not one of the `PLOOPY_DPI_OPTIONS` but an actual DPI value. The default is 50. This avoids moving the volume up or down too fast.

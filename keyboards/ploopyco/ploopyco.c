@@ -45,6 +45,12 @@
 #ifndef PLOOPY_DPI_DEFAULT
 #    define PLOOPY_DPI_DEFAULT 0
 #endif
+#ifndef PLOOPY_SCROLL_DPI
+#    define PLOOPY_SCROLL_DPI 0
+#endif
+#ifndef PLOOPY_VOLUME_SCROLL_DPI_VALUE
+#    define PLOOPY_VOLUME_SCROLL_DPI_VALUE 50
+#endif
 #ifndef PLOOPY_DRAGSCROLL_DIVISOR_H
 #    define PLOOPY_DRAGSCROLL_DIVISOR_H 8.0
 #endif
@@ -65,6 +71,7 @@ uint16_t          dpi_array[] = PLOOPY_DPI_OPTIONS;
 // Trackball State
 bool  is_scroll_clicked    = false;
 bool  is_drag_scroll       = false;
+bool  is_volume_scroll      = false;
 float scroll_accumulated_h = 0;
 float scroll_accumulated_v = 0;
 
@@ -148,7 +155,16 @@ report_mouse_t pointing_device_task_kb(report_mouse_t mouse_report) {
         // Clear the X and Y values of the mouse report
         mouse_report.x = 0;
         mouse_report.y = 0;
+    } else if (is_volume_scroll) {
+        if (mouse_report.x > 0) {
+            register_code(KC_VOLU);
+            unregister_code(KC_VOLU);
+        } else if (mouse_report.x < 0) {
+            register_code(KC_VOLD);
+            unregister_code(KC_VOLD);
+        }
 
+        // Clear the X and Y values of the mouse report
         mouse_report.x = 0;
         mouse_report.y = 0;
     }
@@ -156,31 +172,36 @@ report_mouse_t pointing_device_task_kb(report_mouse_t mouse_report) {
     return pointing_device_task_user(mouse_report);
 }
 
-void process_drag_scroll(uint16_t keycode, keyrecord_t* record) {
-    const bool previous_drag_scroll_state = is_drag_scroll;
+void process_scroll_state(uint16_t trigger_key, bool *scroll_state, uint16_t new_dpi, uint16_t keycode, keyrecord_t* record) {
+    const bool previous_scroll_state = *scroll_state;
 
-    if (keycode == DRAG_SCROLL) {
+    if (keycode == trigger_key) {
 #ifdef PLOOPY_DRAGSCROLL_MOMENTARY
-        is_drag_scroll = record->event.pressed;
+        *scroll_state = record->event.pressed;
 #else
         if (record->event.pressed) {
-            is_drag_scroll = !is_drag_scroll;
+	  *scroll_state = !(*scroll_state);
         }
 #endif
     } else {
-        // Disable drag scroll when any other mouse button is pressed.
-        is_drag_scroll = false;
+        // Disable scroll when any other mouse button is pressed.
+        *scroll_state = false;
     }
 
-    // When scroll begins, adjust the DPI to PLOOPY_SCROLL_DPI.
+    // When scroll begins, adjust the DPI.
     // When the scroll is over restore the default config.
-    if (previous_drag_scroll_state != is_drag_scroll) {
-        if (is_drag_scroll) {
-            pointing_device_set_cpi(dpi_array[PLOOPY_SCROLL_DPI]);
+    if (previous_scroll_state != *scroll_state) {
+        if (*scroll_state) {
+            pointing_device_set_cpi(new_dpi);
         } else {
             pointing_device_set_cpi(dpi_array[keyboard_config.dpi_config]);
         }
     }
+}
+
+void process_scroll(uint16_t keycode, keyrecord_t* record) {
+    process_scroll_state(DRAG_SCROLL, &is_drag_scroll, dpi_array[PLOOPY_SCROLL_DPI], keycode, record);
+    process_scroll_state(VOLUME_SCROLL, &is_volume_scroll, PLOOPY_VOLUME_SCROLL_DPI_VALUE, keycode, record);
 }
 
 bool process_record_kb(uint16_t keycode, keyrecord_t* record) {
@@ -207,7 +228,7 @@ bool process_record_kb(uint16_t keycode, keyrecord_t* record) {
     }
 
     // Always called to ensure side effects of scrolling are handled.
-    process_drag_scroll(keycode, record);
+    process_scroll(keycode, record);
 
     return true;
 }
