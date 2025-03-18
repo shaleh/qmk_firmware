@@ -17,6 +17,11 @@
         "raw": true
     },
     "diode_direction": "ROW2COL",
+    "eeprom": {
+        "wear_leveling": {
+            "backing_size": 4096
+        }
+    },
     "matrix_size": {
         "rows": 6,
         "cols": 17

@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 #include "quantum.h"
 
 // clang-format off
@@ -113,7 +113,7 @@ const ckled2001_led g_ckled2001_leds[LED_MATRIX_LED_COUNT] = {
     {0, F_4},
     {0, F_3},
     {0, F_2},
-    {0, F_1}, 
+    {0, F_1},
     {0, D_4},
 };
 

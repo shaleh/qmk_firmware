@@ -47,9 +47,10 @@ uint8_t bluetooth_keyboard_leds(void);
 void    bluetooth_send_keyboard(report_keyboard_t *report);
 void    bluetooth_send_mouse(report_mouse_t *report);
 void    bluetooth_send_extra(report_extra_t *report);
+void    bluetooth_send_nkro(report_nkro_t *report) {}
 
 /* host struct */
-host_driver_t bluetooth_driver = {bluetooth_keyboard_leds, bluetooth_send_keyboard, bluetooth_send_mouse, bluetooth_send_extra};
+host_driver_t bluetooth_driver = {bluetooth_keyboard_leds, bluetooth_send_keyboard, bluetooth_send_nkro, bluetooth_send_mouse, bluetooth_send_extra};
 
 #define BLUETOOTH_EVENT_QUEUE_SIZE 16
 bluetooth_event_t bt_event_queue[BLUETOOTH_EVENT_QUEUE_SIZE];

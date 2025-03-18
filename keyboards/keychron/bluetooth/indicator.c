@@ -36,9 +36,13 @@
 #endif
 
 #ifdef LED_MATRIX_ENABLE
+#    define LED_MATRIX_TIMEOUT_INFINITE (UINT32_MAX)
+#
 #    define DECIDE_TIME(t, duration) (duration == 0 ? LED_MATRIX_TIMEOUT_INFINITE : ((t > duration) ? t : duration))
 #endif
 #ifdef RGB_MATRIX_ENABLE
+#    define RGB_MATRIX_TIMEOUT_INFINITE (UINT32_MAX)
+#
 #    define DECIDE_TIME(t, duration) (duration == 0 ? RGB_MATRIX_TIMEOUT_INFINITE : ((t > duration) ? t : duration))
 #endif
 
@@ -127,8 +131,13 @@ static pin_t host_led_pin_list[HOST_DEVICES_COUNT] = HOST_LED_PIN_LIST;
 #    define LED_DRIVER_ALLOW_SHUTDOWN rgb_matrix_driver_allow_shutdown
 #    define LED_DRIVER_ENABLE_NOEEPROM rgb_matrix_enable_noeeprom
 #    define LED_DRIVER_DISABLE_NOEEPROM rgb_matrix_disable_noeeprom
+#if 0
+// Disabled because RGB_MATRIX_TIMEOUT is only controlled at compile time.
+// The original keychron code modified the quantum rgb_matrix. At the moment
+// I don't care about bluetooth.
 #    define LED_DRIVER_DISABLE_TIMEOUT_SET rgb_matrix_disable_timeout_set
 #    define LED_DRIVER_DISABLE_TIME_RESET rgb_matrix_disable_time_reset
+#endif
 #endif
 void indicator_init(void) {
     memset(&indicator_config, 0, sizeof(indicator_config));
@@ -158,11 +167,21 @@ inline void indicator_disable(void) {
 }
 
 void indicator_set_backlit_timeout(uint32_t time) {
+#if 0
+// Disabled because RGB_MATRIX_TIMEOUT is only controlled at compile time.
+// The original keychron code modified the quantum rgb_matrix. At the moment
+// I don't care about bluetooth.
     LED_DRIVER_DISABLE_TIMEOUT_SET(time);
+#endif
 }
 
 static inline void indicator_reset_backlit_time(void) {
+#if 0
+// Disabled because RGB_MATRIX_TIMEOUT is only controlled at compile time.
+// The original keychron code modified the quantum rgb_matrix. At the moment
+// I don't care about bluetooth.
     LED_DRIVER_DISABLE_TIME_RESET();
+#endif
 }
 
 bool indicator_is_enabled(void) {

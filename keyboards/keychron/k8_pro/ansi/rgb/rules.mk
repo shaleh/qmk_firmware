@@ -1,1 +1,1 @@
-# This file intentionally blank
+RGB_MATRIX_ENABLE = yes

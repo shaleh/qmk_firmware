@@ -52,12 +52,17 @@ key_combination_t key_comb_list[4] = {
 bool                   firstDisconnect  = true;
 bool                   bt_factory_reset = false;
 static virtual_timer_t pairing_key_timer;
-extern uint8_t         g_pwm_buffer[DRIVER_COUNT][192];
 
 static void pairing_key_timer_cb(void *arg) {
     bluetooth_pairing_ex(*(uint8_t *)arg, NULL);
 }
 #endif
+
+#if (DRIVER_COUNT != 2)
+FAIL
+#endif
+
+extern uint8_t         g_pwm_buffer[DRIVER_COUNT][192];
 
 bool dip_switch_update_kb(uint8_t index, bool active) {
     if (index == 0) {
@@ -74,10 +79,10 @@ bool dip_switch_update_kb(uint8_t index, bool active) {
 
 #ifdef KC_BLUETOOTH_ENABLE
 bool process_record_kb_bt(uint16_t keycode, keyrecord_t *record) {
+    static uint8_t host_idx = 0;
 #else
 bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
 #endif
-    static uint8_t host_idx = 0;
 
     switch (keycode) {
         case KC_LOPTN:
@@ -153,10 +158,10 @@ void keyboard_post_init_kb(void) {
 
     ckbt51_init(false);
     bluetooth_init();
+    writePin(BAT_LOW_LED_PIN, BAT_LOW_LED_PIN_ON_STATE);
 #endif
 
     power_on_indicator_timer_buffer = sync_timer_read32() | 1;
-    writePin(BAT_LOW_LED_PIN, BAT_LOW_LED_PIN_ON_STATE);
     writePin(LED_CAPS_LOCK_PIN, LED_PIN_ON_STATE);
 #ifdef KC_BLUETOOTH_ENABLE
     writePin(H3, HOST_LED_PIN_ON_STATE);
@@ -167,6 +172,7 @@ void keyboard_post_init_kb(void) {
 
 void matrix_scan_kb(void) {
     if (factory_timer_buffer && timer_elapsed32(factory_timer_buffer) > 2000) {
+#ifdef KC_BLUETOOTH_ENABLE
         factory_timer_buffer = 0;
         if (bt_factory_reset) {
             bt_factory_reset = false;
@@ -174,18 +180,23 @@ void matrix_scan_kb(void) {
             wait_ms(5);
             palWriteLine(CKBT51_RESET_PIN, PAL_HIGH);
         }
+#endif
     }
 
     if (power_on_indicator_timer_buffer) {
         if (sync_timer_elapsed32(power_on_indicator_timer_buffer) > POWER_ON_LED_DURATION) {
             power_on_indicator_timer_buffer = 0;
 
+#ifdef KC_BLUETOOTH_ENABLE
             writePin(BAT_LOW_LED_PIN, !BAT_LOW_LED_PIN_ON_STATE);
             writePin(H3, !HOST_LED_PIN_ON_STATE);
+#endif
             if (!host_keyboard_led_state().caps_lock) writePin(LED_CAPS_LOCK_PIN, !LED_PIN_ON_STATE);
         } else {
+#ifdef KC_BLUETOOTH_ENABLE
             writePin(BAT_LOW_LED_PIN, BAT_LOW_LED_PIN_ON_STATE);
             writePin(H3, HOST_LED_PIN_ON_STATE);
+#endif
             writePin(LED_CAPS_LOCK_PIN, LED_PIN_ON_STATE);
         }
     }
@@ -263,7 +274,7 @@ void bluetooth_pre_task(void) {
 }
 #endif
 
-void battery_calculte_voltage(uint16_t value) {
+void battery_calculate_voltage(uint16_t value) {
     uint16_t voltage = ((uint32_t)value) * 2246 / 1000;
 
 #ifdef LED_MATRIX_ENABLE
@@ -289,9 +300,12 @@ void battery_calculte_voltage(uint16_t value) {
         voltage += compensation;
     }
 #endif
+#ifdef KC_BLUETOOTH_ENABLE
     battery_set_voltage(voltage);
+#endif
 }
 
+#if 0
 bool via_command_kb(uint8_t *data, uint8_t length) {
     switch (data[0]) {
 #ifdef KC_BLUETOOTH_ENABLE
@@ -310,7 +324,9 @@ bool via_command_kb(uint8_t *data, uint8_t length) {
 
     return true;
 }
+#endif
 
+#if 0
 #if !defined(VIA_ENABLE)
 void raw_hid_receive(uint8_t *data, uint8_t length) {
     switch (data[0]) {
@@ -319,4 +335,5 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
             break;
     }
 }
+#endif
 #endif
