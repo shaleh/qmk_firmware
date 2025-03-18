@@ -18,9 +18,6 @@
 
 #include_next <mcuconf.h>
 
-#undef STM32_LSI_ENABLED
-#define STM32_LSI_ENABLED TRUE
-
 /* Set HCLK to 48 MHz as tradeoff of USB lowest clockand and
  * lower power comsumption for bluetooth. Will use dynamic
  * clock when STM32L4 is supported in ChibiOS */
@@ -34,6 +31,9 @@
 #define STM32_I2C_USE_I2C1 TRUE
 
 #ifdef KC_BLUETOOTH_ENABLE
+#    undef STM32_LSI_ENABLED
+#    define STM32_LSI_ENABLED TRUE
+#
 #    undef STM32_SERIAL_USE_USART2
 #    define STM32_SERIAL_USE_USART2 TRUE
 #endif

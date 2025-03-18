@@ -36,7 +36,6 @@ typedef struct PACKED {
     uint8_t keycode[3];
 } key_combination_t;
 
-static uint32_t factory_timer_buffer            = 0;
 static uint32_t power_on_indicator_timer_buffer = 0;
 static uint32_t siri_timer_buffer               = 0;
 static uint8_t  mac_keycode[4]                  = {KC_LOPT, KC_ROPT, KC_LCMD, KC_RCMD};
@@ -49,20 +48,19 @@ key_combination_t key_comb_list[4] = {
 };
 
 #ifdef KC_BLUETOOTH_ENABLE
+static uint32_t        factory_timer_buffer = 0;
 bool                   firstDisconnect  = true;
 bool                   bt_factory_reset = false;
 static virtual_timer_t pairing_key_timer;
+
+#if defined(LED_MATRIX_ENABLE) || defined(RGB_MATRIX_ENABLE)
+extern uint8_t         g_pwm_buffer[DRIVER_COUNT][192];
+#endif
 
 static void pairing_key_timer_cb(void *arg) {
     bluetooth_pairing_ex(*(uint8_t *)arg, NULL);
 }
 #endif
-
-#if (DRIVER_COUNT != 2)
-FAIL
-#endif
-
-extern uint8_t         g_pwm_buffer[DRIVER_COUNT][192];
 
 bool dip_switch_update_kb(uint8_t index, bool active) {
     if (index == 0) {
@@ -171,8 +169,8 @@ void keyboard_post_init_kb(void) {
 }
 
 void matrix_scan_kb(void) {
-    if (factory_timer_buffer && timer_elapsed32(factory_timer_buffer) > 2000) {
 #ifdef KC_BLUETOOTH_ENABLE
+    if (factory_timer_buffer && timer_elapsed32(factory_timer_buffer) > 2000) {
         factory_timer_buffer = 0;
         if (bt_factory_reset) {
             bt_factory_reset = false;
@@ -180,8 +178,8 @@ void matrix_scan_kb(void) {
             wait_ms(5);
             palWriteLine(CKBT51_RESET_PIN, PAL_HIGH);
         }
-#endif
     }
+#endif
 
     if (power_on_indicator_timer_buffer) {
         if (sync_timer_elapsed32(power_on_indicator_timer_buffer) > POWER_ON_LED_DURATION) {
@@ -272,7 +270,6 @@ void bluetooth_pre_task(void) {
         }
     }
 }
-#endif
 
 void battery_calculate_voltage(uint16_t value) {
     uint16_t voltage = ((uint32_t)value) * 2246 / 1000;
@@ -300,12 +297,11 @@ void battery_calculate_voltage(uint16_t value) {
         voltage += compensation;
     }
 #endif
-#ifdef KC_BLUETOOTH_ENABLE
     battery_set_voltage(voltage);
-#endif
 }
+#endif
 
-#if 0
+#ifdef VIA_ENABLE
 bool via_command_kb(uint8_t *data, uint8_t length) {
     switch (data[0]) {
 #ifdef KC_BLUETOOTH_ENABLE
@@ -324,16 +320,4 @@ bool via_command_kb(uint8_t *data, uint8_t length) {
 
     return true;
 }
-#endif
-
-#if 0
-#if !defined(VIA_ENABLE)
-void raw_hid_receive(uint8_t *data, uint8_t length) {
-    switch (data[0]) {
-        case RAW_HID_CMD:
-            via_command_kb(data, length);
-            break;
-    }
-}
-#endif
 #endif
