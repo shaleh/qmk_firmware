@@ -14,19 +14,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef RGB_MATRIX_ENABLE
-/* RGB Matrix Driver Configuration */
-#    define DRIVER_COUNT 2
-#    define DRIVER_ADDR_1 0b1110111
-#    define DRIVER_ADDR_2 0b1110100
+#pragma once
 
-/* RGB Matrix Configuration */
-#    define DRIVER_1_LED_TOTAL 51
-#    define DRIVER_2_LED_TOTAL 40
-#    define RGB_MATRIX_LED_COUNT (DRIVER_1_LED_TOTAL + DRIVER_2_LED_TOTAL)
+#ifdef RGB_MATRIX_ENABLE
+/* RGB Matrix driver configuration */
+
+#    define SNLED27351_I2C_ADDRESS_1 SNLED27351_I2C_ADDRESS_VDDIO
+#    define SNLED27351_I2C_ADDRESS_2 SNLED27351_I2C_ADDRESS_GND
+#    define DRIVER_1_LED_COUNT 57
+#    define DRIVER_2_LED_COUNT 40
+#    define RGB_MATRIX_LED_COUNT (DRIVER_1_LED_COUNT + DRIVER_2_LED_COUNT)
+
+#    define DRIVER_COUNT SNLED27351_DRIVER_COUNT
 
 /* Set to infinit, which is use in USB mode by default */
 #    define RGB_MATRIX_TIMEOUT RGB_MATRIX_TIMEOUT_INFINITE
+
 /* Allow shutdown of led driver to save power */
 #    define RGB_MATRIX_DRIVER_SHUTDOWN_ENABLE
 /* Turn off backlight on low brightness to save power */
@@ -41,7 +44,7 @@
 #    define RGB_MATRIX_FRAMEBUFFER_EFFECTS
 
 /* Set LED driver current */
-#    define CKLED2001_CURRENT_TUNE \
+#    define SNLED27351_CURRENT_TUNE \
         { 0x38, 0x38, 0x38, 0x38, 0x38, 0x38, 0x38, 0x38, 0x38, 0x38, 0x38, 0x38 }
 
 #endif

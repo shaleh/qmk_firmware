@@ -14,13 +14,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef LED_MATRIX_ENABLE
-/* LED Matrix Driver Configuration */
-#    define DRIVER_COUNT 1
-#    define DRIVER_ADDR_1 0b1110100
+#pragma once
 
-/* LED Matrix Configuration */
+#ifdef LED_MATRIX_ENABLE
+/* LED matrix driver configuration */
+#    define SNLED27351_I2C_ADDRESS_1 SNLED27351_I2C_ADDRESS_GND
 #    define LED_MATRIX_LED_COUNT 91
+
+#    define DRIVER_COUNT SNLED27351_DRIVER_COUNT
 
 /* Set to infinit, which is use in USB mode by default */
 #    define LED_MATRIX_TIMEOUT LED_MATRIX_TIMEOUT_INFINITE
@@ -39,7 +40,6 @@
 #    define PHASE_CHANNEL MSKPHASE_6CHANNEL
 
 /* Set LED driver current */
-#    define CKLED2001_CURRENT_TUNE \
-        { 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60 }
+#    define SNLED27351_CURRENT_TUNE  { 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60 }
 
 #endif

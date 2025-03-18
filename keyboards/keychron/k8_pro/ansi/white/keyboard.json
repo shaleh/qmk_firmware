@@ -3,11 +3,8 @@
         "pid": "0x0283",
         "device_version": "1.0.0"
     },
-    "features": {
-        "led_matrix": true
-    },
     "led_matrix": {
-        "driver": "CKLED2001",
+        "driver": "snled27351",
         "animations": {
             "none": true,
             "solid": true,
